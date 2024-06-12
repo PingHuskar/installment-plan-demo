@@ -27,7 +27,7 @@ for (const row of rows) {
     <td>${row.thismonthpaymentdate}</td>
     <td>${row.PaymentAmount}</td>
     <td>${row.DeductPrincipal}</td>
-    <td>${row.DeductPrincipal}</td>
+    <td>${row.InterestDueAmount}</td>
     <td>${row.RemainingPrincipal}</td>
     </tr>`;
 }
