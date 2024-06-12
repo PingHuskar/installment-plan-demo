@@ -82,7 +82,7 @@ const CalculateInstallmentPlan = (
 
     if (DeductPrincipal >= RemainingPrincipal) {
       DeductPrincipal = RemainingPrincipal;
-      let lastPaymentAmount = RemainingPrincipal + InterestDueAmount;
+      let lastPaymentAmount = round(RemainingPrincipal + InterestDueAmount);
       rows.push({
         countInstallment: countInstallment + 1,
         prevmonthpaymentdate: prevmonthpaymentdate.toLocaleDateString(),
