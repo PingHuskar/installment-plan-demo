@@ -11,7 +11,7 @@ function formatDate(date) {
     date = new Date(date)
     return date.toLocaleDateString("th-TH", {
       year: "numeric",
-      month: "long",
+      month: "numeric",
       day: "numeric",
     });
 }
