@@ -15,12 +15,24 @@ console.log(installments)
 const IntRates = searchParams.get(`intrates`).split(`,`);
 console.log(IntRates);
 
-const PaymentAmount = [
-  { from: 1, to: 12, installment: parseInt(installments.at(0)), IntRate: parseFloat(IntRates.at(0)) },
-  { from: 3, to: 24, installment:  parseInt(installments.at(1)), IntRate: parseFloat(IntRates.at(1)) },
-  { from: 25, to: 36, installment:  parseInt(installments.at(2)), IntRate: parseFloat(IntRates.at(2)) },
-  { from: 37, to: 360, installment:  parseInt(installments.at(3)), IntRate: parseFloat(IntRates.at(3)) },
-];
+const Tos = searchParams.get(`tos`).split(`,`);
+console.log(Tos);
+
+const TosLen = Tos.length
+console.log(TosLen);
+
+let frommonth = 1
+
+const PaymentAmount = [];
+for (let i = 0; i < TosLen; i++) {
+    PaymentAmount.push({
+      from: frommonth,
+      to: parseInt(Tos.at(i)),
+      installment: parseInt(installments.at(i)),
+      IntRate: parseFloat(IntRates.at(i)),
+    });
+    frommonth = parseInt(Tos.at(i)) + 1;
+}
 
 PaymentAmount.at(-1).to = 999;
 
