@@ -8,3 +8,7 @@
 table {
     border-collapse: collapse;
 }
+
+.err {
+    color: red;
+}

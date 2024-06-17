@@ -1,30 +1,58 @@
-const searchParams = new URLSearchParams(location.search)
-// http://127.0.0.1:5500/?dueday=27&termyear=30&principal=93000&disbdate=2023-11-15&firstpaymentdate=2023-11-27&installment=600,600,600,600&intrates=0.0325,0.0365,0.051,0.0594
+let rows
+const toUnixTS = (date) => {
+  const c = new Date(date)
+  return Math.floor(c.getTime() / 1000);
+}
+const updateTable = () => {
+  
+  document.querySelector(`tbody`).innerHTML = ``;
 
-const disbdate = searchParams.get(`disbdate`);
-const DISBURSEMENTDATE = new Date(disbdate);
-console.log(DISBURSEMENTDATE);
-const firstpaymentdate = searchParams.get(`firstpaymentdate`);
-const PAYMENTFIRSTDATE = new Date(firstpaymentdate);
-console.log(PAYMENTFIRSTDATE);
-const PAYMENTDUEDAY = parseInt(searchParams.get(`dueday`));
-const TermYear = parseInt(searchParams.get(`termyear`));
-const Principal = parseInt(searchParams.get(`principal`));
-const installments = searchParams.get(`installment`).split(`,`);
-console.log(installments)
-const IntRates = searchParams.get(`intrates`).split(`,`);
-console.log(IntRates);
+  const disbdate = document.getElementById(`disbdate`).value;
+  const DISBURSEMENTDATE = new Date(disbdate);
+  console.log(DISBURSEMENTDATE);
+  const firstpaymentdate = document.getElementById(`firstpaymentdate`).value;
+  const PAYMENTFIRSTDATE = new Date(firstpaymentdate);
+  console.log(PAYMENTFIRSTDATE);
 
-const Tos = searchParams.get(`tos`).split(`,`);
-console.log(Tos);
+  console.log(toUnixTS(disbdate) < toUnixTS(PAYMENTFIRSTDATE));
+  document.getElementById(`firstpaymentdateerr`).innerText = ``
+  if (!(toUnixTS(disbdate) < toUnixTS(PAYMENTFIRSTDATE))) {
+    document.getElementById(`firstpaymentdateerr`).innerText = `disbdate is not before paymentfirstdate`;
+    return
+  }
+  const PAYMENTDUEDAY = parseInt(document.getElementById(`dueday`).value);
+  const TermYear = parseInt(document.getElementById(`termyear`).value);
+  const Principal = parseInt(document.getElementById(`principal`).value);
+  document.getElementById(`principalerr`).innerText = ``;
+  if (Principal <= 0) {
+    document.getElementById(`principalerr`).innerText = `principal error`;
+    return
+  }
+  const installments = document.getElementById(`installment`).value.split(`,`);
+  console.log(installments);
+  const IntRates = document.getElementById(`intrates`).value.split(`,`);
+  console.log(IntRates);
 
-const TosLen = Tos.length
-console.log(TosLen);
+  const Tos = document.getElementById(`tos`).value.split(`,`);
+  console.log(Tos);
 
-let frommonth = 1
+  const TosLen = Tos.length;
+  console.log(TosLen);
+  
+  document.getElementById(`tiererr`).innerText = ``;
+  
+  if (!((installments.length === IntRates.length) && (TosLen === IntRates.length)))
+    {
+      document.getElementById(
+        `tiererr`
+      ).innerText = `No of Tier not Match ${installments.length}:${IntRates.length}:${TosLen}`;
+      return;
+    }
+  
+  let frommonth = 1;
 
-const PaymentAmount = [];
-for (let i = 0; i < TosLen; i++) {
+  const PaymentAmount = [];
+  for (let i = 0; i < TosLen; i++) {
     PaymentAmount.push({
       from: frommonth,
       to: parseInt(Tos.at(i)),
@@ -32,27 +60,42 @@ for (let i = 0; i < TosLen; i++) {
       IntRate: parseFloat(IntRates.at(i)),
     });
     frommonth = parseInt(Tos.at(i)) + 1;
-}
+  }
 
-PaymentAmount.at(-1).to = 999;
+  PaymentAmount.at(-1).to = 999;
 
-const rows = CalculateInstallmentPlan(
-  DISBURSEMENTDATE,
-  PAYMENTFIRSTDATE,
-  PAYMENTDUEDAY,
-  TermYear,
-  Principal,
-  PaymentAmount
-);
+  rows = CalculateInstallmentPlan(
+    DISBURSEMENTDATE,
+    PAYMENTFIRSTDATE,
+    PAYMENTDUEDAY,
+    TermYear,
+    Principal,
+    PaymentAmount
+  );
 
-console.log(rows);
-for (const row of rows) {
+  document.getElementById(`termerr`).innerText = ``;
+  if (TermYear * 12 < rows.length) {
+    document.getElementById(`termerr`).innerText = `Overflow Term`;
+    return
+  }
+  if (rows.at(-1).RemainingPrincipal != 0) {
+    document.getElementById(`termerr`).innerText = `RemainingPrincipal Error`;
+  }
+
+  console.log(rows);
+  for (const row of rows) {
+    if (row.DeductPrincipal < 0) {
+      document.getElementById(`termerr`).innerText += `\nPaymentAmount Error`;
+    }
     document.querySelector(`tbody`).innerHTML += `<tr>
-    <td>${row.countInstallment}</td>
-    <td>${formatDate(row.thismonthpaymentdate)}</td>
-    <td>${formatCurrency(row.PaymentAmount)}</td>
-    <td>${formatCurrency(row.DeductPrincipal)}</td>
-    <td>${formatCurrency(row.InterestDueAmount)}</td>
-    <td>${formatCurrency(row.RemainingPrincipal)}</td>
-    </tr>`;
-}
+  <td>${row.countInstallment}</td>
+  <td>${formatDate(row.thismonthpaymentdate)}</td>
+  <td>${formatCurrency(row.PaymentAmount)}</td>
+  <td>${formatCurrency(row.DeductPrincipal)}</td>
+  <td>${formatCurrency(row.InterestDueAmount)}</td>
+  <td>${formatCurrency(row.RemainingPrincipal)}</td>
+  </tr>`;
+  }
+  google.charts.setOnLoadCallback(drawChart);
+};
+updateTable()

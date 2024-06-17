@@ -9,6 +9,50 @@
 </head>
 
 <body>
+    <div class="">
+        <label for="disbdate">disbdate</label>
+        <input type="date" id="disbdate" value="2023-12-24" onchange="updateTable()">
+    </div>
+    <div class="">
+        <label for="firstpaymentdate">firstpaymentdate</label>
+        <input type="date" id="firstpaymentdate" value="2023-12-20" onchange="updateTable()">
+        </div>
+    <div class="">
+        <span class="err" id="firstpaymentdateerr"></span>
+        </div>
+    <div class="">
+        <label for="dueday">dueday</label>
+        <input type="number" id="dueday" value="25" max="31" onchange="updateTable()">
+    </div>
+    <div class="">
+        <label for="termyear">termyear</label>
+        <input type="number" id="termyear" value="30" onchange="updateTable()">
+    </div>
+    <div class="">
+        <label for="principal">principal</label>
+        <input type="number" id="principal" value="40000" onchange="updateTable()">
+    </div>
+    <div class="">
+        <span class="err" id="principalerr"></span>
+    </div>
+    <div class="">
+        <label for="installment">installment</label>
+        <input type="text" id="installment" value="1211,1186" onchange="updateTable()">
+    </div>
+    <div class="">
+        <label for="intrates">intrates</label>
+        <input type="text" id="intrates" value="0.05625,0.03625" onchange="updateTable()">
+    </div>
+    <div class="">
+        <label for="tos">tos</label>
+        <input type="text" id="tos" value="12,36" onchange="updateTable()">
+    </div>
+    <div class="">
+        <span class="err" id="tiererr"></span>
+    </div>
+    <div class="">
+        <span class="err" id="termerr"></span>
+    </div>
     <table border="1">
         <thead>
             <th>งวดที่</th>
@@ -29,7 +73,6 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script defer>
         google.charts.load('current', { 'packages': ['corechart'] });
-        google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
             const chartArr = []
